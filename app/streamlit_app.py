@@ -577,7 +577,12 @@ elif page == "🔮  Predict":
                 },
             ))
             fig_gauge.update_layout(
-                **CHART_THEME, height=240, margin=dict(l=20, r=20, t=30, b=10)
+                template="plotly_dark",
+                paper_bgcolor="rgba(13,13,30,0)",
+                plot_bgcolor="rgba(13,13,30,0)",
+                font=dict(family="DM Sans, sans-serif", color="#c5c8f0"),
+                height=240,
+                margin=dict(l=20, r=20, t=30, b=10)
             )
             st.plotly_chart(fig_gauge, use_container_width=True)
 
