@@ -1,0 +1,34 @@
+# Raw data folder
+data/raw/
+
+# Jupyter notebook checkpoints (messy internal files)
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+
+# Old versioned data folders (V1, v2)
+data/processed/V1/
+data/processed/v2/
+
+# Models new folder (duplicate)
+models/New folder/
+
+# App new folder (duplicate)
+app/New folder/
+
+# Archive zip (too large, raw data)
+archive.zip
+archive/train.csv
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment
+.env
+.venv/
+venv/
+
+# OS files
+.DS_Store
+Thumbs.db
