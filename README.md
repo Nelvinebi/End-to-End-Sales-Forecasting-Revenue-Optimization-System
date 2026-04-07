@@ -11,13 +11,13 @@
 ![License: MIT](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Complete-brightgreen?style=for-the-badge)
 
-> A **production-grade machine learning system** that trains and compares three regression models on 844,392 real Rossmann retail store sales records (2013–2015) to forecast daily revenue, quantify promotion impact, and deliver an interactive Streamlit dashboard — achieving **XGBoost RMSE of €1,866** with full explainability via SHAP values.
+> A **production-grade machine learning system** that trains and compares three regression models on 844,392 real Rossmann retail store sales records (2013–2015) to forecast daily revenue, quantify promotion impact, and deliver an interactive Streamlit dashboard achieving **XGBoost RMSE of €1,866** with full explainability via SHAP values.
 
 </div>
 
 <div align="center">
 
-[![Live Dashboard](https://img.shields.io/badge/🚀%20Click%20for%20Live%20Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](#)
+[![Live Dashboard](https://img.shields.io/badge/🚀%20Click%20for%20Live%20Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://nelvin-end-to-end-sales-forecasting-revenue-optimization-system.streamlit.app/)
 
 </div>
 
@@ -27,12 +27,12 @@
 
 Retail companies operate across hundreds of stores simultaneously, each influenced by a complex mix of promotions, competition, seasonality, holidays, and store-specific characteristics. Without reliable sales forecasting, businesses face:
 
-- **Overstocking or understocking** — tying up capital or losing revenue
-- **Inefficient promotion scheduling** — spending without measuring ROI
-- **Poor staffing decisions** — misalignment between labour and demand
-- **Missed revenue opportunities** — failure to capitalise on seasonal peaks
+- **Overstocking or understocking:** tying up capital or losing revenue
+- **Inefficient promotion scheduling:** spending without measuring ROI
+- **Poor staffing decisions:** misalignment between labour and demand
+- **Missed revenue opportunities:** failure to capitalise on seasonal peaks
 
-The **Rossmann dataset** (1,115 stores across Germany, 2013–2015) presents a realistic multi-store forecasting challenge: predict 6 weeks of future daily sales per store, factoring in promotions, competition distance, school holidays, and store type — exactly what a real retail data science team would build.
+The **Rossmann dataset** (1,115 stores across Germany, 2013–2015) presents a realistic multi-store forecasting challenge: predict 6 weeks of future daily sales per store, factoring in promotions, competition distance, school holidays, and store type exactly what a real retail data science team would build.
 
 ---
 
@@ -50,7 +50,7 @@ The **Rossmann dataset** (1,115 stores across Germany, 2013–2015) presents a r
 
 ## 🗂️ Dataset
 
-All data is sourced from the **Rossmann Store Sales Kaggle Competition** — real retail data, not synthetic.
+All data is sourced from the **Rossmann Store Sales Kaggle Competition** real retail data, not synthetic.
 
 ### Source Files
 
@@ -64,11 +64,11 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 
 | Parameter | Value |
 |-----------|-------|
-| Source | Kaggle — Rossmann Store Sales Competition |
+| Source | Kaggle Rossmann Store Sales Competition |
 | Stores | 1,115 stores across Germany |
 | Time Period | January 2013 – July 2015 |
 | Records (after cleaning) | 844,392 open-store days |
-| Target Variable | `Sales` — daily revenue in euros |
+| Target Variable | `Sales` daily revenue in euros |
 | Training Period | Jan 2013 – Dec 2014 (648,360 rows) |
 | Test Period | Jan 2015 – Jul 2015 (196,032 rows) |
 
@@ -76,7 +76,7 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 
 | Variable | Type | Description |
 |----------|------|-------------|
-| `Sales` | Target | Daily revenue (€) — what we predict |
+| `Sales` | Target | Daily revenue (€) what we predict |
 | `Promo` | Binary | Whether a store ran a promotion that day |
 | `StoreType` | Categorical | Store format (a, b, c, d) |
 | `Assortment` | Categorical | Product range level (a, b, c) |
@@ -94,7 +94,7 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 - **Data Processing:** Pandas, NumPy
 - **Explainability:** SHAP (SHapley Additive exPlanations)
 - **Visualisation:** Matplotlib, Seaborn, Plotly
-- **Dashboard:** Streamlit — multi-page interactive web app
+- **Dashboard:** Streamlit multi-page interactive web app
 - **Model Persistence:** Joblib
 - **Pipeline Orchestration:** Custom `main.py` CLI with modular `src/` architecture
 - **Environment:** Anaconda / Python virtual environment
@@ -104,11 +104,11 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 ## ⚙️ Methodology / Project Workflow
 
 1. **Data Ingestion:** Load `train.csv` and `store.csv`; merge on `Store` ID using a left join to attach store metadata to every sales record
-2. **Data Cleaning:** Remove closed-store days (`Open == 0`) — 172,817 rows eliminated as Sales = 0 introduces noise; fill `CompetitionDistance` nulls with median; fill remaining nulls with 0
+2. **Data Cleaning:** Remove closed-store days (`Open == 0`) 172,817 rows eliminated as Sales = 0 introduces noise; fill `CompetitionDistance` nulls with median; fill remaining nulls with 0
 3. **Feature Engineering:** Extract 7 time-based features from `Date` (Year, Month, Day, WeekOfYear, DayOfWeek, IsWeekend, IsPromo); one-hot encode StoreType, Assortment, StateHoliday; convert boolean columns to integer for XGBoost compatibility
-4. **Leakage Prevention:** Drop `Customers` (unknown at prediction time), `Open` (always 1 post-filter), `PromoInterval` (mixed-type text); apply **time-based split** — never random shuffle for time series
+4. **Leakage Prevention:** Drop `Customers` (unknown at prediction time), `Open` (always 1 post-filter), `PromoInterval` (mixed-type text); apply **time-based split** never random shuffle for time series
 5. **Sampling for Prototyping:** Draw reproducible random samples (100K train, 50K test, `random_state=42`) to enable fast model iteration without kernel crashes
-6. **Model Training:** Train Linear Regression (baseline), Random Forest (`n_estimators=50, max_depth=8`), and XGBoost (`n_estimators=100, lr=0.1, max_depth=6`) — each timed and evaluated
+6. **Model Training:** Train Linear Regression (baseline), Random Forest (`n_estimators=50, max_depth=8`), and XGBoost (`n_estimators=100, lr=0.1, max_depth=6`) each timed and evaluated
 7. **Evaluation:** Compute RMSE, MAE, and R² per model; rank by RMSE; log improvement percentages over baseline
 8. **Explainability:** Apply `shap.TreeExplainer` to the XGBoost model; generate summary bar and beeswarm plots to quantify feature impact
 9. **Persistence:** Save all three models as `.pkl` files via Joblib; verify load-and-predict integrity
@@ -119,36 +119,36 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 
 ## 📊 Key Features
 
-- ✅ **Real retail data:** 1M+ rows from 1,115 Rossmann stores across Germany (2013–2015) — no synthetic data
-- ✅ **Production ML pipeline:** `main.py` CLI orchestrates all stages — preprocessing → features → training → evaluation — runnable with a single command
+- ✅ **Real retail data:** 1M+ rows from 1,115 Rossmann stores across Germany (2013–2015) no synthetic data
+- ✅ **Production ML pipeline:** `main.py` CLI orchestrates all stages preprocessing → features → training → evaluation runnable with a single command
 - ✅ **Three-model comparison:** Linear Regression, Random Forest, and XGBoost trained on identical data splits for fair comparison
-- ✅ **Time-based train/test split:** Chronological split (pre/post 2015-01-01) mirrors real-world forecasting — no future data leakage
+- ✅ **Time-based train/test split:** Chronological split (pre/post 2015-01-01) mirrors real-world forecasting no future data leakage
 - ✅ **25 engineered features:** Date decomposition, weekend flags, promo indicators, competition proximity, and store characteristics
-- ✅ **Data leakage prevention:** `Customers`, `Open`, and `PromoInterval` explicitly removed — only features known at prediction time are used
-- ✅ **SHAP explainability:** Feature impact quantified — reveals that Promo, DayOfWeek, and CompetitionDistance are the top sales drivers
+- ✅ **Data leakage prevention:** `Customers`, `Open`, and `PromoInterval` explicitly removed only features known at prediction time are used
+- ✅ **SHAP explainability:** Feature impact quantified reveals that Promo, DayOfWeek, and CompetitionDistance are the top sales drivers
 - ✅ **7 publication-ready visualisations:** Model comparison, predicted vs actual, sales by day, promotion impact, monthly trend, residuals, and feature importance
 - ✅ **Interactive Streamlit dashboard:** 4-page app with real-time prediction form, animated metric cards, Plotly analytics, and model architecture details
-- ✅ **Modular `src/` architecture:** Clean separation of concerns — config, preprocessing, feature engineering, training, evaluation, and prediction are independent modules
+- ✅ **Modular `src/` architecture:** Clean separation of concerns config, preprocessing, feature engineering, training, evaluation, and prediction are independent modules
 
 ---
 
 ## 📸 Visualisations
 
-### 🔹 Model Comparison — XGBoost Wins by 26%
-> XGBoost (RMSE €1,866) outperforms Random Forest (€2,425) by 23% and Linear Regression (€2,678) by 30% — establishing gradient boosting as the clear winner for this structured retail dataset
+### 🔹 Model Comparison, XGBoost Wins by 26%
+> XGBoost (RMSE €1,866) outperforms Random Forest (€2,425) by 23% and Linear Regression (€2,678) by 30% establishing gradient boosting as the clear winner for this structured retail dataset
 
 ![Model Comparison](visualization/01_model_comparison.png)
 
 ---
 
-### 🔹 Predicted vs Actual Sales — XGBoost Accuracy
+### 🔹 Predicted vs Actual Sales XGBoost Accuracy
 > Scatter plot of 5,000 test predictions against actual sales; points cluster tightly around the red perfect-prediction line (R² = 0.622), confirming the model captures the majority of sales variance
 
 ![Predicted vs Actual](visualization/02_prediction_vs_actual.png)
 
 ---
 
-### 🔹 Sales by Day of Week — Weekend Effect
+### 🔹 Sales by Day of Week, Weekend Effect
 > Saturday generates the highest average sales (~€8,900); the weekend uplift over Monday (~€6,800) validates `IsWeekend` as a strong engineered feature and confirms retail customers concentrate spend on Saturdays
 
 ![Sales by Day](visualization/03_sales_by_day.png)
@@ -156,7 +156,7 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 ---
 
 ### 🔹 Promotion Impact Analysis
-> Active promotions boost average daily sales by ~26% across all days of the week; the effect is strongest on weekdays — where promotions add €2,000–2,500 — confirming `Promo` as the single strongest sales driver in the dataset
+> Active promotions boost average daily sales by ~26% across all days of the week; the effect is strongest on weekdays where promotions add €2,000–2,500 confirming `Promo` as the single strongest sales driver in the dataset
 
 ![Promotion Impact](visualization/04_promotion_impact.png)
 
@@ -169,14 +169,14 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 
 ---
 
-### 🔹 Residuals Analysis — Model Validation
+### 🔹 Residuals Analysis Model Validation
 > Residuals are approximately normally distributed around zero with no strong systematic bias, confirming model errors are random rather than structural; slight right skew at high sales values is expected in retail distributions
 
 ![Residuals](visualization/06_residuals_analysis.png)
 
 ---
 
-### 🔹 XGBoost Feature Importance — Top 15 Drivers
+### 🔹 XGBoost Feature Importance Top 15 Drivers
 > `Promo`, `DayOfWeek`, and `CompetitionDistance` are the three most influential features; temporal features (Month, WeekOfYear) rank highly, validating the feature engineering strategy; store-level features (StoreType, Assortment) add meaningful signal
 
 ![Feature Importance](visualization/07_feature_importance.png)
@@ -226,10 +226,10 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 
 ### Key Insights
 
-- 🔍 **Promotions are the #1 lever:** A single promotion day adds ~€1,500 in expected revenue — the strongest single feature both in raw correlation and SHAP importance
-- 🔍 **XGBoost is 7× faster than Random Forest** and 30% more accurate — ideal for production deployment where inference speed and accuracy must coexist
-- 🔍 **Time matters more than store identity:** Date-based features (Month, WeekOfYear, DayOfWeek) collectively outrank Store ID in importance — suggesting Rossmann's sales are driven by market-wide seasonality more than store-specific factors
-- 🔍 **Competition proximity has non-linear impact:** Stores within 300m of a competitor show measurable sales suppression; stores >5km away see no further benefit from distance — captured by XGBoost's tree structure but not by Linear Regression
+- 🔍 **Promotions are the #1 lever:** A single promotion day adds ~€1,500 in expected revenue the strongest single feature both in raw correlation and SHAP importance
+- 🔍 **XGBoost is 7× faster than Random Forest** and 30% more accurate ideal for production deployment where inference speed and accuracy must coexist
+- 🔍 **Time matters more than store identity:** Date-based features (Month, WeekOfYear, DayOfWeek) collectively outrank Store ID in importance suggesting Rossmann's sales are driven by market-wide seasonality more than store-specific factors
+- 🔍 **Competition proximity has non-linear impact:** Stores within 300m of a competitor show measurable sales suppression; stores >5km away see no further benefit from distance captured by XGBoost's tree structure but not by Linear Regression
 - 🔍 **Leakage-free evaluation matters:** Including `Customers` (correlated with Sales but unknown at prediction time) would inflate R² artificially; its removal is critical for a fair and deployable model
 - 🔍 **R² of 0.62 is realistic:** Retail sales contain genuine unpredictable variance (local events, individual customer behaviour, weather) that no model can capture; 62% explained variance on held-out 2015 data is strong for a store-level daily forecasting task
 
@@ -237,13 +237,13 @@ All data is sourced from the **Rossmann Store Sales Kaggle Competition** — rea
 
 ## 🚀 Live Dashboard
 
-📊 **[View the Interactive Streamlit Dashboard →](#)**
+📊 **[View the Interactive Streamlit Dashboard →](https://nelvin-end-to-end-sales-forecasting-revenue-optimization-system.streamlit.app/)**
 
 The dashboard features 4 interactive pages:
 
 - **🏠 Home:** Hero section, animated metric cards (Best Model, RMSE, R², Stores), key features overview
-- **🔮 Predict:** Real-time sales prediction form — configure Store ID, day, month, promotion status, competitor distance, store type; get instant forecast with business insight alerts
-- **📊 Analytics:** Model comparison charts (Plotly), feature importance bar chart, sales-by-day patterns — all interactive
+- **🔮 Predict:** Real-time sales prediction form configure Store ID, day, month, promotion status, competitor distance, store type; get instant forecast with business insight alerts
+- **📊 Analytics:** Model comparison charts (Plotly), feature importance bar chart, sales-by-day patterns all interactive
 - **ℹ️ Model Info:** XGBoost architecture details, validation strategy table, performance metrics, file location reference
 
 ---
@@ -392,17 +392,17 @@ streamlit run app/streamlit_app.py
 
 **Current Limitations:**
 - Models are trained on a **100K random sample** of 844K rows for speed; full-data training would likely reduce RMSE by 5–10%
-- **R² of 0.62** leaves 38% of variance unexplained — genuine retail noise (local events, individual behaviour) that cannot be captured with tabular features alone
+- **R² of 0.62** leaves 38% of variance unexplained genuine retail noise (local events, individual behaviour) that cannot be captured with tabular features alone
 - The **time-based split** uses a single cutoff date; rolling-window cross-validation would give more robust generalisation estimates
 - `PromoInterval` was dropped due to mixed type handling; extracting "is current month a Promo2 month" could add meaningful signal
-- No **external features** (weather, local events, economic indicators) are included — these are known to improve retail forecasting significantly
+- No **external features** (weather, local events, economic indicators) are included these are known to improve retail forecasting significantly
 
 **Future Improvements:**
 - 📈 Integrate **LightGBM and CatBoost** for a full gradient boosting benchmark comparison
 - 🕐 Apply **Prophet or LSTM** for pure time-series modelling and compare against tabular XGBoost
 - 🧠 Add **SHAP waterfall plots** for individual prediction explanations in the Streamlit dashboard
 - 🔁 Build a **rolling-window cross-validator** to replace the single train/test split
-- 🌦️ Incorporate **external weather data** (temperature, rainfall) as additional features — known drivers of retail footfall
+- 🌦️ Incorporate **external weather data** (temperature, rainfall) as additional features known drivers of retail footfall
 - 🚀 Deploy on **Streamlit Cloud** with model loaded from cloud storage for a fully public live demo
 - 📦 Package as a **Docker container** for reproducible deployment across environments
 - 📊 Implement **MLflow experiment tracking** to log all hyperparameter runs and compare model versions systematically
@@ -413,10 +413,10 @@ streamlit run app/streamlit_app.py
 
 ## 👤 Author
 
-**Name:** [Your Full Name]
+**Name:** Agbozu Ebingiye Nelvin
 
 🤖 Data Scientist | Machine Learning Engineer | Retail Analytics
-📍 [Your Location]
+📍 Port Harcourt
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0077B5?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/YOUR_PROFILE/)
 [![GitHub](https://img.shields.io/badge/GitHub-YOUR_USERNAME-181717?style=flat-square&logo=github)](https://github.com/YOUR_USERNAME)
@@ -428,18 +428,18 @@ streamlit run app/streamlit_app.py
 
 ## 📄 License
 
-This project is licensed under the **MIT License** — free to use, adapt, and build upon for research, education, and commercial analytics.
+This project is licensed under the **MIT License** free to use, adapt, and build upon for research, education, and commercial analytics.
 See the [LICENSE](LICENSE) file for full details.
 
 ---
 
 ## 🙌 Acknowledgements
 
-- **Rossmann Kaggle Competition** — for providing a realistic multi-store retail forecasting dataset that mirrors real-world business complexity
-- **XGBoost team** (Chen & Guestrin, 2016) — for the gradient boosting framework that powers the core prediction engine
-- **SHAP** (Lundberg & Lee, 2017) — for enabling model-agnostic explainability that makes black-box predictions interpretable
-- **Streamlit** — for enabling rapid interactive dashboard development and free cloud deployment
-- **Scikit-learn** community — for the consistent, well-documented ML API that powers the baseline and benchmark models
+- **Rossmann Kaggle Competition** for providing a realistic multi-store retail forecasting dataset that mirrors real-world business complexity
+- **XGBoost team** (Chen & Guestrin, 2016) for the gradient boosting framework that powers the core prediction engine
+- **SHAP** (Lundberg & Lee, 2017) for enabling model-agnostic explainability that makes black-box predictions interpretable
+- **Streamlit** for enabling rapid interactive dashboard development and free cloud deployment
+- **Scikit-learn** community for the consistent, well-documented ML API that powers the baseline and benchmark models
 
 ---
 
