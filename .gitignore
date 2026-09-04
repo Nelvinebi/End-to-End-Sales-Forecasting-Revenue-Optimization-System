@@ -32,3 +32,11 @@ venv/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Quality-tool caches and reports
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
