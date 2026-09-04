@@ -5,15 +5,14 @@ Production-grade Streamlit app with real data loading and interactive charts.
 Run: streamlit run app/streamlit_app.py
 """
 
-import streamlit as st
-import pandas as pd
-import numpy as np
-import joblib
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import sys
 from pathlib import Path
+
+import joblib
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import streamlit as st
 
 # ── Add src/ to path for Config import ──────────────────────────────────────
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -220,9 +219,10 @@ CHART_THEME = dict(
 )
 
 ACCENT = "#667eea"
-GREEN  = "#2ecc71"
-RED    = "#e74c3c"
+GREEN = "#2ecc71"
+RED = "#e74c3c"
 ORANGE = "#f39c12"
+
 
 # ============================================================
 # CACHED LOADERS
@@ -230,7 +230,7 @@ ORANGE = "#f39c12"
 @st.cache_resource(show_spinner=False)
 def load_model_and_config():
     config = Config()
-    model  = joblib.load(config.XGB_MODEL)
+    model = joblib.load(config.XGB_MODEL)
     return model, config
 
 
@@ -259,9 +259,7 @@ try:
     MODEL_OK = True
 except Exception as e:
     MODEL_OK = False
-    st.error(
-        f"❌ Model not found. Run `python main.py --stage all` first.\n\n`{e}`"
-    )
+    st.error(f"❌ Model not found. Run `python main.py --stage all` first.\n\n`{e}`")
 
 # ============================================================
 # SIDEBAR
@@ -321,7 +319,6 @@ with st.sidebar:
 # ① HOME PAGE
 # ============================================================
 if page == "🏠  Home":
-
     st.markdown(
         """
         <div class="hero-banner">
@@ -338,12 +335,12 @@ if page == "🏠  Home":
 
     c1, c2, c3, c4 = st.columns(4)
     kpis = [
-        ("🥇 XGBoost", "Best Model",  "26% better than RF",       "#667eea"),
-        ("€ 1,866",    "RMSE",        "prediction error per day",  "#667eea"),
-        ("0.622",      "R² Score",    "variance explained",        "#2ecc71"),
-        ("1,115",      "Stores",      "Rossmann · 2013–2015",      "#f39c12"),
+        ("🥇 XGBoost", "Best Model", "26% better than RF", "#667eea"),
+        ("€ 1,866", "RMSE", "prediction error per day", "#667eea"),
+        ("0.622", "R² Score", "variance explained", "#2ecc71"),
+        ("1,115", "Stores", "Rossmann · 2013–2015", "#f39c12"),
     ]
-    for col, (val, label, sub, color) in zip([c1, c2, c3, c4], kpis):
+    for col, (val, label, sub, color) in zip([c1, c2, c3, c4], kpis, strict=True):
         col.markdown(
             f"""
             <div class="kpi-card">
@@ -356,7 +353,9 @@ if page == "🏠  Home":
         )
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-header">What this system delivers</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-header">What this system delivers</div>', unsafe_allow_html=True
+    )
 
     f1, f2, f3 = st.columns(3)
     for col, icon, title, desc in zip(
@@ -368,6 +367,7 @@ if page == "🏠  Home":
             "Gradient boosting trained on 648K rows with 25 engineered features and time-based validation to prevent leakage.",
             "Feature importance reveals exactly what drives each prediction — Promo, DayOfWeek, and CompetitionDistance lead.",
         ],
+        strict=True,
     ):
         col.markdown(
             f"""
@@ -381,18 +381,22 @@ if page == "🏠  Home":
         )
 
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="section-header">Model comparison at a glance</div>', unsafe_allow_html=True)
+    st.markdown(
+        '<div class="section-header">Model comparison at a glance</div>', unsafe_allow_html=True
+    )
 
-    fig_home = go.Figure(go.Bar(
-        x=["Linear Regression", "Random Forest", "XGBoost"],
-        y=[2678, 2425, 1866],
-        marker_color=[RED, ORANGE, GREEN],
-        marker_line_width=0,
-        text=["€2,678", "€2,425", "€1,866"],
-        textposition="outside",
-        textfont=dict(color="#c5c8f0", size=13),
-        width=0.45,
-    ))
+    fig_home = go.Figure(
+        go.Bar(
+            x=["Linear Regression", "Random Forest", "XGBoost"],
+            y=[2678, 2425, 1866],
+            marker_color=[RED, ORANGE, GREEN],
+            marker_line_width=0,
+            text=["€2,678", "€2,425", "€1,866"],
+            textposition="outside",
+            textfont=dict(color="#c5c8f0", size=13),
+            width=0.45,
+        )
+    )
     fig_home.update_layout(
         **CHART_THEME,
         title=dict(text="RMSE by Model — lower is better", font=dict(size=14, color="#c5c8f0")),
@@ -408,7 +412,6 @@ if page == "🏠  Home":
 # ② PREDICT PAGE
 # ============================================================
 elif page == "🔮  Predict":
-
     st.markdown(
         """
         <div style="margin-bottom:24px;">
@@ -447,23 +450,26 @@ elif page == "🔮  Predict":
             "Day of Week",
             options=[0, 1, 2, 3, 4, 5, 6],
             format_func=lambda x: [
-                "Monday", "Tuesday", "Wednesday",
-                "Thursday", "Friday", "Saturday", "Sunday"
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+                "Sunday",
             ][x],
             index=5,
         )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        promo          = st.toggle("🎉 Promotion Active", value=True)
-        school_holiday = st.toggle("🏫 School Holiday",  value=False)
-        state_holiday  = st.selectbox(
+        promo = st.toggle("🎉 Promotion Active", value=True)
+        school_holiday = st.toggle("🏫 School Holiday", value=False)
+        state_holiday = st.selectbox(
             "State Holiday", ["None", "Public Holiday", "Easter", "Christmas"], index=0
         )
 
         st.markdown("<br>", unsafe_allow_html=True)
-        competition_distance = st.slider(
-            "📍 Competitor Distance (m)", 0, 20000, 500, step=100
-        )
+        competition_distance = st.slider("📍 Competitor Distance (m)", 0, 20000, 500, step=100)
 
         col_st, col_as = st.columns(2)
         with col_st:
@@ -479,42 +485,46 @@ elif page == "🔮  Predict":
             is_weekend = 1 if day_of_week in [5, 6] else 0
 
             sh_map = {
-                "None":           (1, 0, 0, 0),
+                "None": (1, 0, 0, 0),
                 "Public Holiday": (0, 1, 0, 0),
-                "Easter":         (0, 0, 1, 0),
-                "Christmas":      (0, 0, 0, 1),
+                "Easter": (0, 0, 1, 0),
+                "Christmas": (0, 0, 0, 1),
             }
             sh0, sha, shb, shc = sh_map[state_holiday]
 
-            input_df = pd.DataFrame([{
-                "Store":                    store_id,
-                "DayOfWeek":               day_of_week,
-                "Promo":                   int(promo),
-                "SchoolHoliday":           int(school_holiday),
-                "CompetitionDistance":     float(competition_distance),
-                "CompetitionOpenSinceMonth": 6.0,
-                "CompetitionOpenSinceYear":  2010.0,
-                "Promo2":                  0,
-                "Promo2SinceWeek":         0.0,
-                "Promo2SinceYear":         0.0,
-                "Year":                    2024,
-                "Month":                   month,
-                "Day":                     day,
-                "WeekOfYear":              int(
-                    pd.to_datetime(f"2024-{month:02d}-{day:02d}").strftime("%V")
-                ),
-                "IsWeekend":               is_weekend,
-                "IsPromo":                 int(promo),
-                "StoreType_b":             1 if store_type == "b" else 0,
-                "StoreType_c":             1 if store_type == "c" else 0,
-                "StoreType_d":             1 if store_type == "d" else 0,
-                "Assortment_b":            1 if assortment == "b" else 0,
-                "Assortment_c":            1 if assortment == "c" else 0,
-                "StateHoliday_0":          sh0,
-                "StateHoliday_a":          sha,
-                "StateHoliday_b":          shb,
-                "StateHoliday_c":          shc,
-            }])
+            input_df = pd.DataFrame(
+                [
+                    {
+                        "Store": store_id,
+                        "DayOfWeek": day_of_week,
+                        "Promo": int(promo),
+                        "SchoolHoliday": int(school_holiday),
+                        "CompetitionDistance": float(competition_distance),
+                        "CompetitionOpenSinceMonth": 6.0,
+                        "CompetitionOpenSinceYear": 2010.0,
+                        "Promo2": 0,
+                        "Promo2SinceWeek": 0.0,
+                        "Promo2SinceYear": 0.0,
+                        "Year": 2024,
+                        "Month": month,
+                        "Day": day,
+                        "WeekOfYear": int(
+                            pd.to_datetime(f"2024-{month:02d}-{day:02d}").strftime("%V")
+                        ),
+                        "IsWeekend": is_weekend,
+                        "IsPromo": int(promo),
+                        "StoreType_b": 1 if store_type == "b" else 0,
+                        "StoreType_c": 1 if store_type == "c" else 0,
+                        "StoreType_d": 1 if store_type == "d" else 0,
+                        "Assortment_b": 1 if assortment == "b" else 0,
+                        "Assortment_c": 1 if assortment == "c" else 0,
+                        "StateHoliday_0": sh0,
+                        "StateHoliday_a": sha,
+                        "StateHoliday_b": shb,
+                        "StateHoliday_c": shc,
+                    }
+                ]
+            )
 
             prediction = float(model.predict(input_df)[0])
 
@@ -532,57 +542,62 @@ elif page == "🔮  Predict":
             st.markdown("<br>", unsafe_allow_html=True)
 
             m1, m2, m3 = st.columns(3)
-            m1.metric("Est. Customers",  f"{int(prediction / 9.5):,}", "~€9.5 / visit")
-            m2.metric("Weekly Revenue",  f"€{prediction * 7:,.0f}",    "× 7 days")
-            m3.metric("Monthly Revenue", f"€{prediction * 30:,.0f}",   "× 30 days")
+            m1.metric("Est. Customers", f"{int(prediction / 9.5):,}", "~€9.5 / visit")
+            m2.metric("Weekly Revenue", f"€{prediction * 7:,.0f}", "× 7 days")
+            m3.metric("Monthly Revenue", f"€{prediction * 30:,.0f}", "× 30 days")
 
             # Gauge
-            fig_gauge = go.Figure(go.Indicator(
-                mode="gauge+number+delta",
-                value=prediction,
-                delta={
-                    "reference": 6500,
-                    "valueformat": ",.0f",
-                    "prefix": "€",
-                    "increasing": {"color": GREEN},
-                    "decreasing": {"color": RED},
-                },
-                number={"prefix": "€", "valueformat": ",.0f",
-                        "font": {"size": 26, "color": "#ffffff"}},
-                gauge={
-                    "axis": {
-                        "range": [0, 15000],
-                        "tickprefix": "€",
-                        "tickformat": ",",
-                        "tickcolor": "#555780",
-                        "tickfont": {"color": "#888aaa", "size": 10},
+            fig_gauge = go.Figure(
+                go.Indicator(
+                    mode="gauge+number+delta",
+                    value=prediction,
+                    delta={
+                        "reference": 6500,
+                        "valueformat": ",.0f",
+                        "prefix": "€",
+                        "increasing": {"color": GREEN},
+                        "decreasing": {"color": RED},
                     },
-                    "bar": {"color": ACCENT},
-                    "bgcolor": "#13132a",
-                    "bordercolor": "#2a2a50",
-                    "steps": [
-                        {"range": [0, 5000],    "color": "#1a1a30"},
-                        {"range": [5000, 10000], "color": "#1e1e38"},
-                        {"range": [10000, 15000],"color": "#222245"},
-                    ],
-                    "threshold": {
-                        "line": {"color": GREEN, "width": 2},
-                        "thickness": 0.75,
-                        "value": 6500,
+                    number={
+                        "prefix": "€",
+                        "valueformat": ",.0f",
+                        "font": {"size": 26, "color": "#ffffff"},
                     },
-                },
-                title={
-                    "text": "vs store avg (€6,500)",
-                    "font": {"color": "#888aaa", "size": 12},
-                },
-            ))
+                    gauge={
+                        "axis": {
+                            "range": [0, 15000],
+                            "tickprefix": "€",
+                            "tickformat": ",",
+                            "tickcolor": "#555780",
+                            "tickfont": {"color": "#888aaa", "size": 10},
+                        },
+                        "bar": {"color": ACCENT},
+                        "bgcolor": "#13132a",
+                        "bordercolor": "#2a2a50",
+                        "steps": [
+                            {"range": [0, 5000], "color": "#1a1a30"},
+                            {"range": [5000, 10000], "color": "#1e1e38"},
+                            {"range": [10000, 15000], "color": "#222245"},
+                        ],
+                        "threshold": {
+                            "line": {"color": GREEN, "width": 2},
+                            "thickness": 0.75,
+                            "value": 6500,
+                        },
+                    },
+                    title={
+                        "text": "vs store avg (€6,500)",
+                        "font": {"color": "#888aaa", "size": 12},
+                    },
+                )
+            )
             fig_gauge.update_layout(
                 template="plotly_dark",
                 paper_bgcolor="rgba(13,13,30,0)",
                 plot_bgcolor="rgba(13,13,30,0)",
                 font=dict(family="DM Sans, sans-serif", color="#c5c8f0"),
                 height=240,
-                margin=dict(l=20, r=20, t=30, b=10)
+                margin=dict(l=20, r=20, t=30, b=10),
             )
             st.plotly_chart(fig_gauge, use_container_width=True)
 
@@ -593,13 +608,9 @@ elif page == "🔮  Predict":
                     f"🎉 **Promotion boost** — adds ~€{prediction * 0.26:,.0f} vs no-promo equivalent"
                 )
             if is_weekend:
-                insights.append(
-                    "📅 **Weekend uplift** — Sat/Sun average 15–30% above weekdays"
-                )
+                insights.append("📅 **Weekend uplift** — Sat/Sun average 15–30% above weekdays")
             if competition_distance < 300:
-                insights.append(
-                    "⚠️ **Close competitor** — within 300 m may suppress sales 5–10%"
-                )
+                insights.append("⚠️ **Close competitor** — within 300 m may suppress sales 5–10%")
             if month == 12:
                 insights.append(
                     "🎄 **December peak** — holiday season historically highest sales month"
@@ -643,7 +654,6 @@ elif page == "🔮  Predict":
 # ③ ANALYTICS — ALL CHARTS FROM REAL DATA
 # ============================================================
 elif page == "📊  Analytics":
-
     st.markdown(
         """
         <div style="margin-bottom:24px;">
@@ -663,14 +673,13 @@ elif page == "📊  Analytics":
     with st.spinner("Loading data…"):
         try:
             X_test, y_test = load_processed_data(config)
-            y_pred  = compute_predictions(model, X_test)
-            raw_df  = load_raw_data(config)
+            y_pred = compute_predictions(model, X_test)
+            raw_df = load_raw_data(config)
             DATA_OK = True
         except Exception as e:
             DATA_OK = False
             st.error(
-                f"Could not load processed data. "
-                f"Run `python main.py --stage all` first.\n\n`{e}`"
+                f"Could not load processed data. Run `python main.py --stage all` first.\n\n`{e}`"
             )
 
     if not DATA_OK:
@@ -687,36 +696,46 @@ elif page == "📊  Analytics":
             unsafe_allow_html=True,
         )
 
-        n   = min(4000, len(y_test))
+        n = min(4000, len(y_test))
         rng = np.random.default_rng(42)
         idx = rng.choice(len(y_test), n, replace=False)
-        yt  = np.array(y_test)[idx]
-        yp  = y_pred[idx]
+        yt = np.array(y_test)[idx]
+        yp = y_pred[idx]
 
         fig_scatter = go.Figure()
-        fig_scatter.add_trace(go.Scatter(
-            x=yt, y=yp,
-            mode="markers",
-            marker=dict(color=ACCENT, size=4, opacity=0.5, line=dict(width=0)),
-            name="Predictions",
-        ))
+        fig_scatter.add_trace(
+            go.Scatter(
+                x=yt,
+                y=yp,
+                mode="markers",
+                marker=dict(color=ACCENT, size=4, opacity=0.5, line=dict(width=0)),
+                name="Predictions",
+            )
+        )
         max_val = max(yt.max(), yp.max())
-        fig_scatter.add_trace(go.Scatter(
-            x=[0, max_val], y=[0, max_val],
-            mode="lines",
-            line=dict(color=RED, dash="dash", width=2),
-            name="Perfect Prediction",
-        ))
+        fig_scatter.add_trace(
+            go.Scatter(
+                x=[0, max_val],
+                y=[0, max_val],
+                mode="lines",
+                line=dict(color=RED, dash="dash", width=2),
+                name="Perfect Prediction",
+            )
+        )
 
         rmse_live = float(np.sqrt(np.mean((np.array(y_test) - y_pred) ** 2)))
-        mae_live  = float(np.mean(np.abs(np.array(y_test) - y_pred)))
-        r2_live   = float(
-            1 - np.sum((np.array(y_test) - y_pred) ** 2)
-              / np.sum((np.array(y_test) - np.mean(y_test)) ** 2)
+        mae_live = float(np.mean(np.abs(np.array(y_test) - y_pred)))
+        r2_live = float(
+            1
+            - np.sum((np.array(y_test) - y_pred) ** 2)
+            / np.sum((np.array(y_test) - np.mean(y_test)) ** 2)
         )
 
         fig_scatter.add_annotation(
-            x=0.03, y=0.97, xref="paper", yref="paper",
+            x=0.03,
+            y=0.97,
+            xref="paper",
+            yref="paper",
             text=f"RMSE: €{rmse_live:,.0f}   MAE: €{mae_live:,.0f}   R²: {r2_live:.3f}",
             showarrow=False,
             bgcolor="#1a1a35",
@@ -741,19 +760,23 @@ elif page == "📊  Analytics":
         a1, a2 = st.columns(2)
 
         models_c = ["Linear Regression", "Random Forest", "XGBoost"]
-        rmse_c   = [2678, 2425, 1866]
-        mae_c    = [1959, 1765, 1353]
+        rmse_c = [2678, 2425, 1866]
+        mae_c = [1959, 1765, 1353]
         colors_c = [RED, ORANGE, GREEN]
 
         with a1:
-            fig_rmse = go.Figure(go.Bar(
-                x=models_c, y=rmse_c,
-                marker_color=colors_c, marker_line_width=0,
-                text=[f"€{v:,}" for v in rmse_c],
-                textposition="outside",
-                textfont=dict(color="#c5c8f0"),
-                width=0.5,
-            ))
+            fig_rmse = go.Figure(
+                go.Bar(
+                    x=models_c,
+                    y=rmse_c,
+                    marker_color=colors_c,
+                    marker_line_width=0,
+                    text=[f"€{v:,}" for v in rmse_c],
+                    textposition="outside",
+                    textfont=dict(color="#c5c8f0"),
+                    width=0.5,
+                )
+            )
             fig_rmse.update_layout(
                 **CHART_THEME,
                 title="RMSE — lower is better",
@@ -765,14 +788,18 @@ elif page == "📊  Analytics":
             st.plotly_chart(fig_rmse, use_container_width=True)
 
         with a2:
-            fig_mae = go.Figure(go.Bar(
-                x=models_c, y=mae_c,
-                marker_color=colors_c, marker_line_width=0,
-                text=[f"€{v:,}" for v in mae_c],
-                textposition="outside",
-                textfont=dict(color="#c5c8f0"),
-                width=0.5,
-            ))
+            fig_mae = go.Figure(
+                go.Bar(
+                    x=models_c,
+                    y=mae_c,
+                    marker_color=colors_c,
+                    marker_line_width=0,
+                    text=[f"€{v:,}" for v in mae_c],
+                    textposition="outside",
+                    textfont=dict(color="#c5c8f0"),
+                    width=0.5,
+                )
+            )
             fig_mae.update_layout(
                 **CHART_THEME,
                 title="MAE — lower is better",
@@ -783,13 +810,15 @@ elif page == "📊  Analytics":
             )
             st.plotly_chart(fig_mae, use_container_width=True)
 
-        metrics_df = pd.DataFrame({
-            "Model":          models_c,
-            "RMSE (€)":       rmse_c,
-            "MAE (€)":        mae_c,
-            "Training Time":  ["0.11 s", "11.49 s", "2.54 s"],
-            "vs Baseline":    ["—", "−9.5 %", "−30.3 % ✅"],
-        })
+        metrics_df = pd.DataFrame(
+            {
+                "Model": models_c,
+                "RMSE (€)": rmse_c,
+                "MAE (€)": mae_c,
+                "Training Time": ["0.11 s", "11.49 s", "2.54 s"],
+                "vs Baseline": ["—", "−9.5 %", "−30.3 % ✅"],
+            }
+        )
         st.dataframe(metrics_df, use_container_width=True, hide_index=True)
 
     # ── Tab 2: Feature Importance ────────────────────────────
@@ -800,28 +829,32 @@ elif page == "📊  Analytics":
         )
 
         importance_df = (
-            pd.DataFrame({
-                "Feature":    X_test.columns,
-                "Importance": model.feature_importances_,
-            })
+            pd.DataFrame(
+                {
+                    "Feature": X_test.columns,
+                    "Importance": model.feature_importances_,
+                }
+            )
             .sort_values("Importance", ascending=True)
             .tail(15)
         )
 
-        fig_imp = go.Figure(go.Bar(
-            x=importance_df["Importance"],
-            y=importance_df["Feature"],
-            orientation="h",
-            marker=dict(
-                color=importance_df["Importance"],
-                colorscale=[[0, "#2a1580"], [0.5, ACCENT], [1, "#a78bfa"]],
-                showscale=False,
-                line=dict(width=0),
-            ),
-            text=[f"{v:.4f}" for v in importance_df["Importance"]],
-            textposition="outside",
-            textfont=dict(color="#888aaa", size=11, family="DM Mono"),
-        ))
+        fig_imp = go.Figure(
+            go.Bar(
+                x=importance_df["Importance"],
+                y=importance_df["Feature"],
+                orientation="h",
+                marker=dict(
+                    color=importance_df["Importance"],
+                    colorscale=[[0, "#2a1580"], [0.5, ACCENT], [1, "#a78bfa"]],
+                    showscale=False,
+                    line=dict(width=0),
+                ),
+                text=[f"{v:.4f}" for v in importance_df["Importance"]],
+                textposition="outside",
+                textfont=dict(color="#888aaa", size=11, family="DM Mono"),
+            )
+        )
         fig_imp.update_layout(
             **CHART_THEME,
             title="Top 15 Features Driving Sales Predictions",
@@ -839,7 +872,6 @@ elif page == "📊  Analytics":
 
     # ── Tab 3: Business Patterns ─────────────────────────────
     with tab3:
-
         b1, b2 = st.columns(2)
 
         with b1:
@@ -847,29 +879,26 @@ elif page == "📊  Analytics":
                 '<div class="section-header">Average Sales by Day of Week</div>',
                 unsafe_allow_html=True,
             )
-            day_avg = (
-                raw_df[raw_df["Sales"] > 0]
-                .groupby("DayOfWeek")["Sales"]
-                .mean()
-                .reset_index()
-            )
-            day_avg["Day"]   = day_avg["DayOfWeek"].map(
-                {0:"Mon",1:"Tue",2:"Wed",3:"Thu",4:"Fri",5:"Sat",6:"Sun"}
+            day_avg = raw_df[raw_df["Sales"] > 0].groupby("DayOfWeek")["Sales"].mean().reset_index()
+            day_avg["Day"] = day_avg["DayOfWeek"].map(
+                {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
             )
             day_avg["Color"] = day_avg["DayOfWeek"].apply(
                 lambda x: GREEN if x in [5, 6] else ACCENT
             )
 
-            fig_day = go.Figure(go.Bar(
-                x=day_avg["Day"],
-                y=day_avg["Sales"],
-                marker_color=day_avg["Color"],
-                marker_line_width=0,
-                text=[f"€{v:,.0f}" for v in day_avg["Sales"]],
-                textposition="outside",
-                textfont=dict(color="#c5c8f0", size=11),
-                width=0.6,
-            ))
+            fig_day = go.Figure(
+                go.Bar(
+                    x=day_avg["Day"],
+                    y=day_avg["Sales"],
+                    marker_color=day_avg["Color"],
+                    marker_line_width=0,
+                    text=[f"€{v:,.0f}" for v in day_avg["Sales"]],
+                    textposition="outside",
+                    textfont=dict(color="#c5c8f0", size=11),
+                    width=0.6,
+                )
+            )
             fig_day.update_layout(
                 **CHART_THEME,
                 yaxis=dict(title="Avg Sales (€)", gridcolor="#1e1e35", zeroline=False),
@@ -891,43 +920,56 @@ elif page == "📊  Analytics":
                 .reset_index()
             )
             promo_day["Day"] = promo_day["DayOfWeek"].map(
-                {0:"Mon",1:"Tue",2:"Wed",3:"Thu",4:"Fri",5:"Sat",6:"Sun"}
+                {0: "Mon", 1: "Tue", 2: "Wed", 3: "Thu", 4: "Fri", 5: "Sat", 6: "Sun"}
             )
-            no_promo  = promo_day[promo_day["Promo"] == 0]
+            no_promo = promo_day[promo_day["Promo"] == 0]
             yes_promo = promo_day[promo_day["Promo"] == 1]
 
-            avg_boost = (
-                yes_promo["Sales"].mean() / no_promo["Sales"].mean() - 1
-            ) * 100
+            avg_boost = (yes_promo["Sales"].mean() / no_promo["Sales"].mean() - 1) * 100
 
             fig_promo = go.Figure()
-            fig_promo.add_trace(go.Bar(
-                name="No Promotion",
-                x=no_promo["Day"], y=no_promo["Sales"],
-                marker_color="#2a2a50", marker_line_width=0,
-                width=0.35, offset=-0.18,
-            ))
-            fig_promo.add_trace(go.Bar(
-                name="Promotion Active",
-                x=yes_promo["Day"], y=yes_promo["Sales"],
-                marker_color=GREEN, marker_line_width=0,
-                width=0.35, offset=0.18,
-            ))
+            fig_promo.add_trace(
+                go.Bar(
+                    name="No Promotion",
+                    x=no_promo["Day"],
+                    y=no_promo["Sales"],
+                    marker_color="#2a2a50",
+                    marker_line_width=0,
+                    width=0.35,
+                    offset=-0.18,
+                )
+            )
+            fig_promo.add_trace(
+                go.Bar(
+                    name="Promotion Active",
+                    x=yes_promo["Day"],
+                    y=yes_promo["Sales"],
+                    marker_color=GREEN,
+                    marker_line_width=0,
+                    width=0.35,
+                    offset=0.18,
+                )
+            )
             fig_promo.update_layout(
                 **CHART_THEME,
                 yaxis=dict(title="Avg Sales (€)", gridcolor="#1e1e35", zeroline=False),
                 xaxis=dict(showgrid=False),
                 barmode="overlay",
                 height=360,
-                legend=dict(orientation="h", yanchor="bottom", y=1.02,
-                            bgcolor="rgba(0,0,0,0)"),
-                annotations=[dict(
-                    xref="paper", yref="paper", x=0.98, y=0.96,
-                    text=f"Avg boost: +{avg_boost:.1f}%",
-                    showarrow=False,
-                    bgcolor="#13132a", bordercolor="#2a2a50",
-                    font=dict(color=GREEN, size=11),
-                )],
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, bgcolor="rgba(0,0,0,0)"),
+                annotations=[
+                    dict(
+                        xref="paper",
+                        yref="paper",
+                        x=0.98,
+                        y=0.96,
+                        text=f"Avg boost: +{avg_boost:.1f}%",
+                        showarrow=False,
+                        bgcolor="#13132a",
+                        bordercolor="#2a2a50",
+                        font=dict(color=GREEN, size=11),
+                    )
+                ],
             )
             st.plotly_chart(fig_promo, use_container_width=True)
 
@@ -937,25 +979,22 @@ elif page == "📊  Analytics":
             unsafe_allow_html=True,
         )
         raw_df["YearMonth"] = raw_df["Date"].dt.to_period("M").astype(str)
-        monthly = (
-            raw_df[raw_df["Sales"] > 0]
-            .groupby("YearMonth")["Sales"]
-            .mean()
-            .reset_index()
-        )
+        monthly = raw_df[raw_df["Sales"] > 0].groupby("YearMonth")["Sales"].mean().reset_index()
         monthly["YearMonth_dt"] = pd.to_datetime(monthly["YearMonth"])
 
         fig_trend = go.Figure()
-        fig_trend.add_trace(go.Scatter(
-            x=monthly["YearMonth_dt"],
-            y=monthly["Sales"],
-            mode="lines+markers",
-            line=dict(color=ACCENT, width=2.5),
-            marker=dict(size=5, color=ACCENT),
-            fill="tozeroy",
-            fillcolor="rgba(102,126,234,0.07)",
-            name="Avg Daily Sales",
-        ))
+        fig_trend.add_trace(
+            go.Scatter(
+                x=monthly["YearMonth_dt"],
+                y=monthly["Sales"],
+                mode="lines+markers",
+                line=dict(color=ACCENT, width=2.5),
+                marker=dict(size=5, color=ACCENT),
+                fill="tozeroy",
+                fillcolor="rgba(102,126,234,0.07)",
+                name="Avg Daily Sales",
+            )
+        )
         fig_trend.update_layout(
             **CHART_THEME,
             title="Average Daily Sales by Month",
@@ -977,16 +1016,18 @@ elif page == "📊  Analytics":
             .reset_index()
             .rename(columns={"Sales": "AvgSales"})
         )
-        fig_type = go.Figure(go.Bar(
-            x=type_avg["StoreType"],
-            y=type_avg["AvgSales"],
-            marker_color=[ACCENT, GREEN, ORANGE, "#a855f7"],
-            marker_line_width=0,
-            text=[f"€{v:,.0f}" for v in type_avg["AvgSales"]],
-            textposition="outside",
-            textfont=dict(color="#c5c8f0"),
-            width=0.5,
-        ))
+        fig_type = go.Figure(
+            go.Bar(
+                x=type_avg["StoreType"],
+                y=type_avg["AvgSales"],
+                marker_color=[ACCENT, GREEN, ORANGE, "#a855f7"],
+                marker_line_width=0,
+                text=[f"€{v:,.0f}" for v in type_avg["AvgSales"]],
+                textposition="outside",
+                textfont=dict(color="#c5c8f0"),
+                width=0.5,
+            )
+        )
         fig_type.update_layout(
             **CHART_THEME,
             title="Avg Daily Sales by Store Type (a / b / c / d)",
@@ -1009,16 +1050,21 @@ elif page == "📊  Analytics":
         r1, r2 = st.columns(2)
 
         with r1:
-            fig_hist = go.Figure(go.Histogram(
-                x=residuals,
-                nbinsx=60,
-                marker_color=ACCENT,
-                marker_line_color="#0b0b16",
-                marker_line_width=0.5,
-                opacity=0.85,
-            ))
+            fig_hist = go.Figure(
+                go.Histogram(
+                    x=residuals,
+                    nbinsx=60,
+                    marker_color=ACCENT,
+                    marker_line_color="#0b0b16",
+                    marker_line_width=0.5,
+                    opacity=0.85,
+                )
+            )
             fig_hist.add_vline(
-                x=0, line_color=RED, line_dash="dash", line_width=2,
+                x=0,
+                line_color=RED,
+                line_dash="dash",
+                line_width=2,
                 annotation_text="Zero error",
                 annotation_font_color=RED,
             )
@@ -1033,18 +1079,18 @@ elif page == "📊  Analytics":
 
         with r2:
             samp_n = min(5000, len(y_pred))
-            rng2   = np.random.default_rng(0)
+            rng2 = np.random.default_rng(0)
             samp_i = rng2.choice(len(y_pred), samp_n, replace=False)
 
-            fig_res = go.Figure(go.Scatter(
-                x=y_pred[samp_i],
-                y=residuals[samp_i],
-                mode="markers",
-                marker=dict(color=ACCENT, size=4, opacity=0.45, line=dict(width=0)),
-            ))
-            fig_res.add_hline(
-                y=0, line_color=RED, line_dash="dash", line_width=2
+            fig_res = go.Figure(
+                go.Scatter(
+                    x=y_pred[samp_i],
+                    y=residuals[samp_i],
+                    mode="markers",
+                    marker=dict(color=ACCENT, size=4, opacity=0.45, line=dict(width=0)),
+                )
             )
+            fig_res.add_hline(y=0, line_color=RED, line_dash="dash", line_width=2)
             fig_res.update_layout(
                 **CHART_THEME,
                 title="Residuals vs Predicted Values",
@@ -1059,17 +1105,16 @@ elif page == "📊  Analytics":
             unsafe_allow_html=True,
         )
         s1, s2, s3, s4 = st.columns(4)
-        s1.metric("Mean Error",        f"€{np.mean(residuals):,.1f}",  "should be ≈ 0")
-        s2.metric("Std of Errors",     f"€{np.std(residuals):,.0f}",   "spread")
-        s3.metric("Max Overestimate",  f"€{np.min(residuals):,.0f}",   "worst under")
-        s4.metric("Max Underestimate", f"€{np.max(residuals):,.0f}",   "worst over")
+        s1.metric("Mean Error", f"€{np.mean(residuals):,.1f}", "should be ≈ 0")
+        s2.metric("Std of Errors", f"€{np.std(residuals):,.0f}", "spread")
+        s3.metric("Max Overestimate", f"€{np.min(residuals):,.0f}", "worst under")
+        s4.metric("Max Underestimate", f"€{np.max(residuals):,.0f}", "worst over")
 
 
 # ============================================================
 # ④ MODEL INFO PAGE
 # ============================================================
 elif page == "ℹ️   Model Info":
-
     st.markdown(
         """
         <div style="margin-bottom:24px;">
@@ -1108,9 +1153,9 @@ elif page == "ℹ️   Model Info":
 
     with col_stats:
         for label, val, color, sub in [
-            ("Training Samples", "100,000",  "#667eea", "from 648K total (15%)"),
-            ("Features",         "25",       "#2ecc71", "engineered from 18 raw"),
-            ("Model File Size",  "0.46 MB",  "#f39c12", "xgboost_sales_model.pkl"),
+            ("Training Samples", "100,000", "#667eea", "from 648K total (15%)"),
+            ("Features", "25", "#2ecc71", "engineered from 18 raw"),
+            ("Model File Size", "0.46 MB", "#f39c12", "xgboost_sales_model.pkl"),
         ]:
             st.markdown(
                 f"""
@@ -1127,20 +1172,31 @@ elif page == "ℹ️   Model Info":
         '<div class="section-header">Validation Strategy</div>',
         unsafe_allow_html=True,
     )
-    val_df = pd.DataFrame({
-        "Aspect":    ["Train / Test Split", "Sampling", "Primary Metric",
-                      "Secondary Metrics",  "Leakage Prevention"],
-        "Method":    ["Time-based (pre / post 2015-01-01)", "Random n=100K (seed=42)",
-                      "RMSE", "MAE, R², MAPE",
-                      "Customers, Open, PromoInterval removed"],
-        "Rationale": [
-            "Mirrors real forecasting — no future data in training",
-            "Fast iteration without kernel crash",
-            "Penalises large errors heavily",
-            "Comprehensive view of error distribution",
-            "Only features available at prediction time are retained",
-        ],
-    })
+    val_df = pd.DataFrame(
+        {
+            "Aspect": [
+                "Train / Test Split",
+                "Sampling",
+                "Primary Metric",
+                "Secondary Metrics",
+                "Leakage Prevention",
+            ],
+            "Method": [
+                "Time-based (pre / post 2015-01-01)",
+                "Random n=100K (seed=42)",
+                "RMSE",
+                "MAE, R², MAPE",
+                "Customers, Open, PromoInterval removed",
+            ],
+            "Rationale": [
+                "Mirrors real forecasting — no future data in training",
+                "Fast iteration without kernel crash",
+                "Penalises large errors heavily",
+                "Comprehensive view of error distribution",
+                "Only features available at prediction time are retained",
+            ],
+        }
+    )
     st.dataframe(val_df, use_container_width=True, hide_index=True)
 
     st.markdown(
@@ -1150,10 +1206,11 @@ elif page == "ℹ️   Model Info":
     p1, p2, p3, p4 = st.columns(4)
     for col, label, val, color, sub in zip(
         [p1, p2, p3, p4],
-        ["RMSE",    "MAE",     "R²",     "MAPE"],
-        ["€ 1,866", "€ 1,353", "0.622",  "~18 %"],
-        [ACCENT,    ACCENT,    GREEN,    ORANGE],
+        ["RMSE", "MAE", "R²", "MAPE"],
+        ["€ 1,866", "€ 1,353", "0.622", "~18 %"],
+        [ACCENT, ACCENT, GREEN, ORANGE],
         ["avg error magnitude", "avg absolute error", "variance explained", "% error"],
+        strict=True,
     ):
         col.markdown(
             f"""
@@ -1202,16 +1259,16 @@ elif page == "ℹ️   Model Info":
 
     if MODEL_OK:
         file_rows = [
-            ("🤖 Primary Model (XGBoost)",  config.XGB_MODEL),
-            ("🌲 Backup Model (RF)",         config.RF_MODEL),
-            ("📏 Baseline (Linear Reg.)",    config.LR_MODEL),
-            ("📂 Processed Data folder",     config.PROCESSED_DATA),
-            ("📊 Visualisations folder",     config.VIZ_DIR),
-            ("🗂️ Raw Data folder",            config.RAW_DATA),
+            ("🤖 Primary Model (XGBoost)", config.XGB_MODEL),
+            ("🌲 Backup Model (RF)", config.RF_MODEL),
+            ("📏 Baseline (Linear Reg.)", config.LR_MODEL),
+            ("📂 Processed Data folder", config.PROCESSED_DATA),
+            ("📊 Visualisations folder", config.VIZ_DIR),
+            ("🗂️ Raw Data folder", config.RAW_DATA),
         ]
         for label, path in file_rows:
             exists = Path(str(path)).exists()
-            tick   = "✅" if exists else "❌"
+            tick = "✅" if exists else "❌"
             st.markdown(
                 f"""
                 <div style="display:flex; justify-content:space-between; align-items:center;
@@ -1228,7 +1285,5 @@ elif page == "ℹ️   Model Info":
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.caption(
-        "Dataset: Rossmann Store Sales (Kaggle) · "
-        "Framework: XGBoost + Streamlit · "
-        "Built with 🏪"
+        "Dataset: Rossmann Store Sales (Kaggle) · Framework: XGBoost + Streamlit · Built with 🏪"
     )
