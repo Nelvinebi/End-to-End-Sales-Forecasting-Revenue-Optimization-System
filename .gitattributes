@@ -1,0 +1,4 @@
+*.py text eol=lf
+*.toml text eol=lf
+requirements*.txt text eol=lf
+runtime.txt text eol=lf
