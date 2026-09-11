@@ -19,12 +19,32 @@ def load_model_and_data(config):
 
 
 def calculate_metrics(y_true, y_pred):
-    """Calculate all metrics."""
+    """Calculate regression metrics with zero-safe MAPE."""
+    y_true_array = np.asarray(y_true, dtype=float)
+    y_pred_array = np.asarray(y_pred, dtype=float)
+
+    if y_true_array.shape != y_pred_array.shape:
+        raise ValueError("Actual and predicted values must have matching shapes.")
+
+    nonzero_mask = y_true_array != 0
+    if nonzero_mask.any():
+        mape = (
+            np.mean(
+                np.abs(
+                    (y_true_array[nonzero_mask] - y_pred_array[nonzero_mask])
+                    / y_true_array[nonzero_mask]
+                )
+            )
+            * 100
+        )
+    else:
+        mape = np.nan
+
     return {
-        "RMSE": np.sqrt(mean_squared_error(y_true, y_pred)),
-        "MAE": mean_absolute_error(y_true, y_pred),
-        "R2": r2_score(y_true, y_pred),
-        "MAPE": np.mean(np.abs((y_true - y_pred) / y_true)) * 100,
+        "RMSE": np.sqrt(mean_squared_error(y_true_array, y_pred_array)),
+        "MAE": mean_absolute_error(y_true_array, y_pred_array),
+        "R2": r2_score(y_true_array, y_pred_array),
+        "MAPE": mape,
     }
 
 
@@ -86,6 +106,10 @@ def run_evaluation(config):
 
     # Metrics
     metrics = calculate_metrics(y_test, y_pred)
+
+    zero_target_count = int((np.asarray(y_test) == 0).sum())
+    if zero_target_count:
+        print(f"ℹ️ MAPE excludes {zero_target_count:,} observations whose actual sales are zero.")
 
     print("\n" + "=" * 50)
     print("XGBOOST METRICS")
