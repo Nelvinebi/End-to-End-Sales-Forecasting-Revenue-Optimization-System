@@ -3,7 +3,6 @@ import sys
 import time
 from pathlib import Path
 
-# Add src to path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from config import Config
@@ -17,8 +16,9 @@ from train import run_training
 class Pipeline:
     """End-to-end ML pipeline orchestrator."""
 
-    def __init__(self):
+    def __init__(self, *, sample=False):
         self.config = Config()
+        self.sample = sample
         self.start_time = None
 
     def log_stage(self, name):
@@ -36,27 +36,23 @@ class Pipeline:
     def run_full_pipeline(self):
         """Execute all stages."""
         print("""
-        
-             SALES FORECASTING ML PIPELINE                            
-             Rossmann Store Sales Prediction                         
+
+             SALES FORECASTING ML PIPELINE
+             Rossmann Store Sales Prediction
         """)
 
-        # Stage 1: Preprocessing
         self.log_stage("1. DATA PREPROCESSING")
         run_preprocessing(self.config)
         self.log_complete()
 
-        # Stage 2: Feature Engineering
         self.log_stage("2. FEATURE ENGINEERING")
         run_feature_engineering(self.config)
         self.log_complete()
 
-        # Stage 3: Training
         self.log_stage("3. MODEL TRAINING")
-        run_training(self.config)
+        run_training(self.config, sample=self.sample)
         self.log_complete()
 
-        # Stage 4: Evaluation
         self.log_stage("4. MODEL EVALUATION")
         run_evaluation(self.config)
         self.log_complete()
@@ -70,18 +66,18 @@ class Pipeline:
         print("   Predictions: Use: python main.py --stage predict")
 
     def run_single_stage(self, stage):
-        """Run specific stage."""
+        """Run a specific stage."""
         stages = {
             "preprocess": (run_preprocessing, "DATA PREPROCESSING"),
             "features": (run_feature_engineering, "FEATURE ENGINEERING"),
-            "train": (run_training, "MODEL TRAINING"),
             "evaluate": (run_evaluation, "MODEL EVALUATION"),
             "predict": (run_prediction, "PREDICTION"),
         }
 
-        if stage not in stages:
-            print(f"❌ Unknown stage: {stage}")
-            print(f"Available: {', '.join(stages.keys())}")
+        if stage == "train":
+            self.log_stage("MODEL TRAINING")
+            run_training(self.config, sample=self.sample)
+            self.log_complete()
             return
 
         func, name = stages[stage]
@@ -90,35 +86,38 @@ class Pipeline:
         self.log_complete()
 
 
-def main():
-    """CLI entry point."""
+def parse_args(argv=None):
+    """Parse command-line arguments."""
     parser = argparse.ArgumentParser(
         description="Sales Forecasting ML Pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
   python main.py --stage all          # Run full pipeline
-  python main.py --stage preprocess   # Only preprocessing
-  python main.py --stage train        # Only training
+  python main.py --stage train        # Train on the complete split
+  python main.py --stage train --sample  # Train on bounded samples
   python main.py --stage predict      # Make predictions
         """,
     )
-
     parser.add_argument(
         "--stage",
         choices=["all", "preprocess", "features", "train", "evaluate", "predict"],
         default="all",
         help="Which pipeline stage to run (default: all)",
     )
+    parser.add_argument(
+        "--sample",
+        action="store_true",
+        help="Use bounded train and test samples during model training",
+    )
+    return parser.parse_args(argv)
 
-    parser.add_argument("--sample", action="store_true", help="Use small sample for quick testing")
 
-    args = parser.parse_args()
+def main(argv=None):
+    """CLI entry point."""
+    args = parse_args(argv)
+    pipeline = Pipeline(sample=args.sample)
 
-    # Create pipeline
-    pipeline = Pipeline()
-
-    # Run
     if args.stage == "all":
         pipeline.run_full_pipeline()
     else:
